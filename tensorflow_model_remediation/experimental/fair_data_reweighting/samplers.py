@@ -35,8 +35,8 @@ def _get_random_number() -> np.random.Generator:
 class SampleWithReplacement(beam.DoFn):
   """Approximate Sampling with replacement.
 
-  If k are desired from a slice with m total points, the algorithm first
-  replicates each point in the slice floor(k/m) points. In the second step, the
+  If k points are desired from a slice with m total points, the algorithm first
+  replicates each point in the slice floor(k/m) times. In the second step, the
   remaining points (if any) are drawn independently at random via a single pass
   over the slice with sampling probability of 1/m.
   """
@@ -52,13 +52,15 @@ class SampleWithReplacement(beam.DoFn):
     If k points are desired from a slice with m total points, the replication
     factor is floor(k/m).
 
+    //TODO plus some random additional number of times?
+    
     Arguments:
       example: A given tf example.
-      slice_weight: A dict mapping slice keys to weights
-      slice_count: A dict mapping slice keys to counts
-      eval_metrics: The eval_metrics object
-      gamma: The quantity governing the sampling factor
-      dataset_size_dict: The size of the full train dataset
+      slice_weight: A dict mapping slice keys to weights.
+      slice_count: A dict mapping slice keys to counts.
+      eval_metrics: The eval_metrics object.
+      gamma: The quantity governing the sampling factor.
+      dataset_size_dict: The size of the full train dataset.
       label_feature_column: The column name of the label.
       skip_slice_membership_check: whether to check for slice membership or not.
 

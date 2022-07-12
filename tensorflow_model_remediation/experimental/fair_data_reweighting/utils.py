@@ -25,7 +25,17 @@ from tensorflow_model_remediation.experimental.fair_data_reweighting.datatypes i
 
 
 def get_first_value(example: tf.train.Example, feature_name: str):
-  """Returns the value of the given feature_name in a given tf.train.Example."""
+  """Returns the value of the given feature_name in a given tf.train.Example.
+  
+  Arguments:
+    example: A given tf example.
+    feature_name: The feature to return from the example.
+    
+  Returns:
+    The value of the given feature.
+  
+  Raises:
+    ValueError if the feature name is not found in the example."""
 
   bundle = example.features.feature[feature_name]
 
@@ -44,6 +54,9 @@ def has_key(slice_key: SliceKey, example: tf.train.Example,
                                                                    float],
             label_feature_column: str) -> bool:
   """Finds if a tf example satisfies a given slice key.
+  
+  Checks whether the example contains a feature with the slice key's feature name,
+  and ensures the feature's value adheres to the slice key's slice name.
 
   Arguments:
     slice_key: A SliceKey object.
@@ -69,6 +82,9 @@ def has_key(slice_key: SliceKey, example: tf.train.Example,
 def get_slice_keys_to_weights(eval_metrics: MetricByFeatureSlice,
                               beta: float) -> Dict[SliceKey, float]:
   """Computes the exponential weights for each SliceKey.
+  
+  Softmaxes the values of the MetricByFeatureSlice object passed, 
+  parametrized by temperature beta.
 
   Arguments:
     eval_metrics: the MetricByFeatureSlice object.
@@ -105,7 +121,7 @@ def get_slice_count(
     slice_keys: The list of slices.
     eval_metrics: The MetricByFeatureSlice object.
     label_feature_column: The column name of the label.
-    skip_slice_membership_check: whether to check for slice membership or not.
+    skip_slice_membership_check: whether to check for slice membership or not. //TODO ??
 
   Returns:
     PCollection containing a Dict of slice keys to their counts.
@@ -138,13 +154,17 @@ def get_slice_count(
 
 def tf_dataset_to_tf_examples_list(
     data: tf.data.Dataset) -> Iterator[tf.train.Example]:
-  """Convert tf.data.Dataset object to a list of tf.Example objects, to be used by beam.
+  """Converts a tf.data.Dataset object to a list of tf.Example objects, 
+  to be used by beam.
 
   Arguments:
     data: a tf.data.Dataset dataset.
 
   Yields:
     Iterator of each dataset item in tf.train.Example format.
+  
+  Raises:
+    ValueError if an object in the dataset is of unsupported type or shape.
   """
   # BEGIN-GOOGLE-INTERNAL
   # Taken from
